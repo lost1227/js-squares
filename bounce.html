@@ -1,0 +1,121 @@
+<html>
+<head>
+<style>
+#bounce,#buttons {
+  margin: auto;
+  text-align: center;
+  display: block;
+}
+button {
+  margin: 5px,5px;
+}
+</style>
+</head>
+<body>
+<canvas width="1500" height="800" id="bounce"></canvas>
+<div id="buttons">
+<input type="text" id="fps" size="4" placeholder="FPS" pattern="[0-9]*" onkeypress="enter(event)">
+<button onclick="start(document.getElementById('fps').value);" id="start">Start</button>
+<button onclick="pause();" id="pause">Pause</button>
+<button onclick="clearCanvas();" id="clear">Clear</button>
+<button onclick="WTF(100);" id="explode">Explode</button>
+<label><input id="trace" type="checkbox">Trace</label>
+</div>
+<script>
+var canvas = document.getElementById("bounce");
+var ctx = canvas.getContext("2d");
+var background = "#000000";
+var squares = [];
+var loop;
+
+function square(x,y,vx,vy,size) {
+  this.x = x;
+  this.y = y;
+  this.vx = vx;
+  this.vy = vy;
+  this.size = size;
+  this.color = "#FFFFFF";
+  this.clear = function() {
+    var fill = ctx.fillStyle;
+    ctx.fillStyle=background;
+    ctx.fillRect(this.x,this.y,this.size,this.size);
+    ctx.fillStyle=fill;
+  };
+  this.draw = function() {
+    var fill = ctx.fillStyle;
+    ctx.fillStyle=this.color;
+    ctx.fillRect(this.x,this.y,this.size,this.size);
+    ctx.fillStyle=fill;
+  };
+  this.move = function() {
+    this.x += this.vx;
+    this.y += this.vy;
+  }
+}
+
+function run() {
+  for(var i = 0; i < squares.length; i++) {
+    if(!document.getElementById("trace").checked) {
+      squares[i].clear();
+    }
+    squares[i].move();
+    if(squares[i].x <= 0 || squares[i].x + squares[i].size >= canvas.width) {
+      squares[i].vx = -1*squares[i].vx;
+    }
+    if(squares[i].y <= 0 || squares[i].y + squares[i].size >= canvas.height) {
+      squares[i].vy = -1*squares[i].vy;
+    }
+    squares[i].draw();
+  }
+}
+
+canvas.addEventListener("click",function(evt) {
+  var rect = canvas.getBoundingClientRect();
+  var x = evt.clientX - rect.left;
+  var y = evt.clientY - rect.top;
+  createSquare(x,y);
+});
+
+function createSquare(x,y) {
+  var xv,yv,size;
+  xv = (Math.floor(Math.random() * 20) + 1)* (Math.random() < 0.5 ? -1 : 1);
+  yv = (Math.floor(Math.random() * 20) + 1)* (Math.random() < 0.5 ? -1 : 1);
+  size = (Math.floor(Math.random() * 40) + 5);
+  console.log([x,y,xv,yv,size]);
+  squares.push(new square(x,y,xv,yv,size));
+}
+
+window.onload = function() {
+  ctx.fillstyle = background;
+  ctx.fillRect(0,0,canvas.width,canvas.height);
+  start(60);
+}
+
+function pause() {
+  window.clearInterval(loop);
+}
+function start(fps) {
+  window.clearInterval(loop);
+  loop = window.setInterval(run,1000/fps);
+}
+function clearCanvas() {
+  squares = [];
+  ctx.fillstyle = background;
+  ctx.fillRect(0,0,canvas.width,canvas.height);
+}
+function WTF(num) {
+  for(var i = 0; i < num; i++){
+    createSquare(canvas.width/2,canvas.height/2);
+  }
+}
+function enter(e) {
+  console.log(e);
+  if (e.keyCode == 13) {
+      start(document.getElementById("fps").value);
+      document.getElementById("fps").value="";
+      return false;
+  }
+}
+</script>
+</body>
+</html>
