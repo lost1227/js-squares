@@ -111,9 +111,11 @@ function WTF(num) {
 function enter(e) {
   console.log(e);
   if (e.keyCode == 13) {
-      start(document.getElementById("fps").value);
-      document.getElementById("fps").value="";
-      return false;
+    var val = document.getElementById("fps").value;
+    val = val > 0 ? val : 60;
+    start(val);
+    document.getElementById("fps").value="";
+    return false;
   }
 }
 </script>
